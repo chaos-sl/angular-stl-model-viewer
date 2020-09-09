@@ -199,7 +199,7 @@ export class StlModelViewerComponent implements OnInit, OnDestroy {
     }
     this.rotate(RotateDirection.none);
   }
-  rotate(direction: RotateDirection) {
+  rotate(direction: RotateDirection, stepCount = 1) {
     let step = 0;
     switch (direction) {
       case RotateDirection.up:
@@ -218,7 +218,7 @@ export class StlModelViewerComponent implements OnInit, OnDestroy {
         break;
     }
 
-    if (Math.abs(this.yzAngle + step) < Math.PI / 2) {
+    if (Math.abs(this.yzAngle + step * stepCount) < Math.PI / 2) {
       this.yzAngle += step;
     }
     this.camera.position.x =
