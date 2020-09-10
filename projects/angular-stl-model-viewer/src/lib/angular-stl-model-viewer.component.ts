@@ -107,7 +107,7 @@ export class StlModelViewerComponent implements OnInit, OnDestroy {
 
   xzAngle = 0; // Azimuthal angle
   yzAngle = 0; // Polar angle
-  distance = 3; // PerspectiveCamera distance
+  distance = 1; // PerspectiveCamera distance
   zoomFactor = 0; // OrthographicCamera zoom
 
   hasWebGL = isWebGLAvailable();
@@ -185,34 +185,34 @@ export class StlModelViewerComponent implements OnInit, OnDestroy {
     }
   }
 
-  zoom(direction: ZoomDirection) {
+  zoom(direction: ZoomDirection, stepCount = 1) {
     if (this.camera instanceof THREE.PerspectiveCamera) {
       switch (direction) {
         case ZoomDirection.in:
-          this.distance--;
+          this.distance -= stepCount;
           break;
         case ZoomDirection.out:
-          this.distance++;
+          this.distance += stepCount;
           break;
       }
-      this.distance = this.distance < 3 ? 3 : this.distance;
+      this.distance = this.distance < 0 ? 0 : this.distance;
     }
     this.rotate(RotateDirection.none);
   }
-  rotate(direction: RotateDirection, stepCount = 1) {
+  rotate(direction: RotateDirection, stepCount = 0.1) {
     let step = 0;
     switch (direction) {
       case RotateDirection.up:
-        step = 0.1;
+        step = 1;
         break;
       case RotateDirection.right:
-        this.xzAngle += 0.1;
+        this.xzAngle += 1;
         break;
       case RotateDirection.down:
-        step = -0.1;
+        step = -1;
         break;
       case RotateDirection.left:
-        this.xzAngle -= 0.1;
+        this.xzAngle -= 1;
         break;
       default:
         break;
@@ -220,6 +220,8 @@ export class StlModelViewerComponent implements OnInit, OnDestroy {
 
     if (Math.abs(this.yzAngle + step * stepCount) < Math.PI / 2) {
       this.yzAngle += step;
+    } else {
+      this.yzAngle = step > 0 ? Math.PI / 2 : -Math.PI / 2;
     }
     this.camera.position.x =
       this.distance * Math.cos(this.yzAngle) * Math.cos(this.xzAngle);
