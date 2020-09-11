@@ -30,12 +30,12 @@ export class AppComponent {
   }
   rotate(direction: RotateDirection) {
     for (const viewer of this.viewers) {
-      viewer.rotate(direction);
+      viewer.rotate(direction, 2);
     }
   }
   zoom(direction: ZoomDirection) {
     for (const viewer of this.viewers) {
-      viewer.zoom(direction);
+      viewer.zoom(direction, 5);
     }
   }
 }

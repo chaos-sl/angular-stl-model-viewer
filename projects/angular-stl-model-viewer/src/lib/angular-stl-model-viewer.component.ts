@@ -218,10 +218,10 @@ export class StlModelViewerComponent implements OnInit, OnDestroy {
     if (this.camera instanceof THREE.PerspectiveCamera) {
       switch (direction) {
         case ZoomDirection.in:
-          this.distance -= stepCount;
+          this.distance += stepCount;
           break;
         case ZoomDirection.out:
-          this.distance += stepCount;
+          this.distance -= stepCount;
           break;
       }
       this.distance = this.distance < 0 ? 0 : this.distance;
@@ -232,25 +232,25 @@ export class StlModelViewerComponent implements OnInit, OnDestroy {
     let step = 0;
     switch (direction) {
       case RotateDirection.up:
-        step = 1;
+        step = 0.1;
         break;
       case RotateDirection.right:
-        this.xzAngle += 1;
+        this.xzAngle += 0.1;
         break;
       case RotateDirection.down:
-        step = -1;
+        step = -0.1;
         break;
       case RotateDirection.left:
-        this.xzAngle -= 1;
+        this.xzAngle -= 0.1;
         break;
       default:
         break;
     }
 
-    if (Math.abs(this.xzAngle + step * stepCount) < Math.PI / 2) {
-      this.xzAngle += step;
+    if (Math.abs(this.yzAngle + step * stepCount) < Math.PI / 2) {
+      this.yzAngle += step;
     } else {
-      this.xzAngle = step > 0 ? Math.PI / 2 : -Math.PI / 2;
+      this.yzAngle = step > 0 ? Math.PI / 2 : -Math.PI / 2;
     }
     this.camera.position.x =
       this.distance * Math.cos(this.yzAngle) * Math.cos(this.xzAngle);
@@ -309,10 +309,9 @@ export class StlModelViewerComponent implements OnInit, OnDestroy {
     geometry.center();
     const { x, y, z } = geometry.boundingBox.max;
     this.distance = Math.max(x, y, z) * 10;
-    console.debug(this.material);
 
     const mesh = new THREE.Mesh(geometry, this.material);
-    mesh.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
+    mesh.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), -Math.PI / 2);
     const vectorOptions = ['position', 'scale', 'up'];
     const options = Object.assign({}, defaultMeshOptions, meshOptions);
 
