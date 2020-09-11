@@ -15,7 +15,7 @@ import * as THREE from 'three';
 
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-
+import { LightProbeGenerator } from 'three/examples/jsm/lights/LightProbeGenerator.js';
 import { Vector3 } from 'three';
 
 export enum RotateDirection {
@@ -43,7 +43,7 @@ const defaultMeshOptions = {
   castShadow: true,
   position: new THREE.Vector3(0, 0, 0),
   receiveShadow: true,
-  scale: new THREE.Vector3(0.03, 0.03, 0.03),
+  scale: new THREE.Vector3(1, 1, 1),
 };
 
 function isWebGLAvailable() {
@@ -83,14 +83,12 @@ export class StlModelViewerComponent implements OnInit, OnDestroy {
   }
   @Input() hasControls = true;
   @Input() camera: THREE.PerspectiveCamera = new THREE.PerspectiveCamera(
-    35,
-    window.innerWidth / window.innerHeight,
-    1,
-    15
+    15,
+    window.innerWidth / window.innerHeight
   );
 
   @Input() cameraTarget: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
-  @Input() light: THREE.Light = new THREE.PointLight(0xffffff);
+  @Input() light: THREE.Light = new THREE.DirectionalLight(0xffffff, 1);
   @Input() material: THREE.Material = new THREE.MeshPhongMaterial({
     color: 0xc4c4c4,
     shininess: 100,
@@ -107,14 +105,17 @@ export class StlModelViewerComponent implements OnInit, OnDestroy {
 
   xzAngle = 0; // Azimuthal angle
   yzAngle = 0; // Polar angle
-  distance = 0.15; // PerspectiveCamera distance
+  distance = 10; // PerspectiveCamera distance
   zoomFactor = 0; // OrthographicCamera zoom
+
+  texture: THREE.CubeTexture;
 
   hasWebGL = isWebGLAvailable();
   meshGroup = new THREE.Object3D();
   isRendered = false;
   showStlModel = true;
   stlLoader = new STLLoader();
+  lightProbe = new THREE.LightProbe(undefined, 1);
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -123,18 +124,46 @@ export class StlModelViewerComponent implements OnInit, OnDestroy {
   ) {
     this.cdr.detach();
     // default light position
-    this.light.position.set(0, 0, 5);
+    this.light.position.set(10, 10, 10);
 
     // default camera position
-    this.camera.position.set(0, 0, this.distance);
+    this.camera.position.set(0, this.distance, 0);
     this.camera.lookAt(0, 0, 0);
 
     // default scene background
-    this.scene.background = new THREE.Color(0xffffff);
+    this.scene.background = new THREE.Color(0xdcdcdc);
+    new THREE.CubeTextureLoader().load(
+      this.genCubeUrls('assets/', '.png'),
+      (cubeTexture) => {
+        cubeTexture.encoding = THREE.sRGBEncoding;
+        this.lightProbe.copy(LightProbeGenerator.fromCubeTexture(cubeTexture));
+        // this.scene.background = cubeTexture;
+        this.texture = cubeTexture;
+        this.material = new THREE.MeshStandardMaterial({
+          color: 0xffffff,
+          metalness: 0.4,
+          roughness: 0.2,
+          envMap: cubeTexture,
+          envMapIntensity: 1,
+        });
+      }
+    );
 
     // default renderer options
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.shadowMap.enabled = true;
+  }
+
+  // envmap
+  private genCubeUrls(prefix, postfix) {
+    return [
+      prefix + 'bg' + postfix,
+      prefix + 'bg' + postfix,
+      prefix + 'bg' + postfix,
+      prefix + 'bg' + postfix,
+      prefix + 'bg' + postfix,
+      prefix + 'bg' + postfix,
+    ];
   }
 
   ngOnInit() {
@@ -185,7 +214,7 @@ export class StlModelViewerComponent implements OnInit, OnDestroy {
     }
   }
 
-  zoom(direction: ZoomDirection, stepCount = 0.15) {
+  zoom(direction: ZoomDirection, stepCount = 1) {
     if (this.camera instanceof THREE.PerspectiveCamera) {
       switch (direction) {
         case ZoomDirection.in:
@@ -199,7 +228,7 @@ export class StlModelViewerComponent implements OnInit, OnDestroy {
     }
     this.rotate(RotateDirection.none);
   }
-  rotate(direction: RotateDirection, stepCount = 0.1) {
+  rotate(direction: RotateDirection, stepCount = 1) {
     let step = 0;
     switch (direction) {
       case RotateDirection.up:
@@ -218,10 +247,10 @@ export class StlModelViewerComponent implements OnInit, OnDestroy {
         break;
     }
 
-    if (Math.abs(this.yzAngle + step * stepCount) < Math.PI / 2) {
-      this.yzAngle += step;
+    if (Math.abs(this.xzAngle + step * stepCount) < Math.PI / 2) {
+      this.xzAngle += step;
     } else {
-      this.yzAngle = step > 0 ? Math.PI / 2 : -Math.PI / 2;
+      this.xzAngle = step > 0 ? Math.PI / 2 : -Math.PI / 2;
     }
     this.camera.position.x =
       this.distance * Math.cos(this.yzAngle) * Math.cos(this.xzAngle);
@@ -233,6 +262,7 @@ export class StlModelViewerComponent implements OnInit, OnDestroy {
   }
 
   private async init() {
+    this.scene.add(this.lightProbe);
     this.camera.add(this.light);
     this.scene.add(this.camera);
 
@@ -240,8 +270,6 @@ export class StlModelViewerComponent implements OnInit, OnDestroy {
     if (this.hasControls && !this.controls) {
       this.controls = new OrbitControls(this.camera, this.renderer.domElement);
       this.controls.enableZoom = true;
-      this.controls.minDistance = 1;
-      this.controls.maxDistance = 10;
 
       this.controls.addEventListener('change', this.render);
     }
@@ -280,9 +308,11 @@ export class StlModelViewerComponent implements OnInit, OnDestroy {
     geometry.computeBoundingBox();
     geometry.center();
     const { x, y, z } = geometry.boundingBox.max;
-    this.distance = Math.max(x, y, z) * 0.2;
-    const mesh = new THREE.Mesh(geometry, this.material);
+    this.distance = Math.max(x, y, z) * 10;
+    console.debug(this.material);
 
+    const mesh = new THREE.Mesh(geometry, this.material);
+    mesh.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2);
     const vectorOptions = ['position', 'scale', 'up'];
     const options = Object.assign({}, defaultMeshOptions, meshOptions);
 
