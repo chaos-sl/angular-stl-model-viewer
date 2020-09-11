@@ -107,7 +107,7 @@ export class StlModelViewerComponent implements OnInit, OnDestroy {
 
   xzAngle = 0; // Azimuthal angle
   yzAngle = 0; // Polar angle
-  distance = 1; // PerspectiveCamera distance
+  distance = 0.15; // PerspectiveCamera distance
   zoomFactor = 0; // OrthographicCamera zoom
 
   hasWebGL = isWebGLAvailable();
@@ -185,7 +185,7 @@ export class StlModelViewerComponent implements OnInit, OnDestroy {
     }
   }
 
-  zoom(direction: ZoomDirection, stepCount = 1) {
+  zoom(direction: ZoomDirection, stepCount = 0.15) {
     if (this.camera instanceof THREE.PerspectiveCamera) {
       switch (direction) {
         case ZoomDirection.in:
@@ -269,7 +269,7 @@ export class StlModelViewerComponent implements OnInit, OnDestroy {
     const meshes: THREE.Object3D[] = await Promise.all(meshCreations);
 
     meshes.map((mesh) => this.meshGroup.add(mesh));
-    this.render();
+    this.rotate(RotateDirection.none);
   }
 
   async createMesh(
@@ -277,6 +277,10 @@ export class StlModelViewerComponent implements OnInit, OnDestroy {
     meshOptions: MeshOptions = {}
   ): Promise<THREE.Mesh> {
     const geometry: THREE.BufferGeometry = await this.stlLoader.loadAsync(path);
+    geometry.computeBoundingBox();
+    geometry.center();
+    const { x, y, z } = geometry.boundingBox.max;
+    this.distance = Math.max(x, y, z) * 0.2;
     const mesh = new THREE.Mesh(geometry, this.material);
 
     const vectorOptions = ['position', 'scale', 'up'];
