@@ -1,0 +1,13 @@
+stl-model-viewer {
+  width: 100%;
+  height: 500px;
+  display: block;
+}
+
+.buttons {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-content: center;
+  gap: 1em;
+}

@@ -1,0 +1,20 @@
+<h1>{{ title }}</h1>
+<div>
+  <stl-model-viewer
+    [meshOptions]="[{ position: { x: 0, y: 0, z: 0 } }]"
+    [stlModels]="upModels"
+  ></stl-model-viewer>
+  <stl-model-viewer
+    [meshOptions]="[{ position: { x: 0, y: 0, z: 0 } }]"
+    [stlModels]="downModels"
+  ></stl-model-viewer>
+</div>
+<div class="buttons">
+  <button (click)="switchPosition()">SwitchPosition</button>
+  <button (click)="rotate(0)">RotateUp</button>
+  <button (click)="rotate(1)">RotateRight</button>
+  <button (click)="rotate(2)">RotateDown</button>
+  <button (click)="rotate(3)">RotateLeft</button>
+  <button (click)="zoom(0)">ZoomIn</button>
+  <button (click)="zoom(1)">ZoomOut</button>
+</div>
