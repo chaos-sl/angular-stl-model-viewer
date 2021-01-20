@@ -1,54 +1,41 @@
 {
   "name": "angular-stl-model-viewer",
-  "version": "0.0.0",
-  "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "build:prod": "ng build --project angular-stl-model-viewer --prod && cp ./README.md ./dist/angular-stl-model-viewer",
-    "build:deploy": "ng build --prod --project examples --base-href angular-stl-model-viewer && gh-pages -d ./dist/examples",
-    "test": "ng test",
-    "lint": "ng lint",
-    "e2e": "ng e2e",
-    "postinstall": "ngcc",
-    "deploy": "ng build --prod && gh-pages -d ./dist/angular-stl-model-viewer"
+  "license": "MIT",
+  "version": "2.0.0",
+  "author": "Marcus Kirsch & Bengt Weiße",
+  "description": "Angular component for rendering a STL model",
+  "bugs": "https://github.com/codaline-io/angular-stl-model-viewer/issues",
+  "homepage": "https://github.com/codaline-io/angular-stl-model-viewer",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codaline-io/angular-stl-model-viewer"
+  },
+  "engines": {
+    "node": ">= 10"
+  },
+  "peerDependencies": {
+    "@angular/common": "^10.0.0",
+    "@angular/core": "^10.0.0",
+    "three": "^0.120.0"
   },
   "dependencies": {
-    "@angular/animations": "^10.1.6",
-    "@angular/common": "^10.1.6",
-    "@angular/compiler": "^10.1.6",
-    "@angular/core": "^10.1.6",
-    "@angular/forms": "^10.1.6",
-    "@angular/platform-browser": "^10.1.6",
-    "@angular/platform-browser-dynamic": "^10.1.6",
-    "@angular/router": "^10.1.6",
-    "rxjs": "~6.6.2",
-    "three": "^0.120.1",
-    "tslib": "^2.0.1",
-    "zone.js": "~0.10.3"
+    "tslib": "^2.0.1"
   },
-  "devDependencies": {
-    "@angular-devkit/build-angular": "^0.1001.7",
-    "@angular-devkit/build-ng-packagr": "^0.1001.7",
-    "@angular/cli": "^10.1.7",
-    "@angular/compiler-cli": "^10.1.6",
-    "@types/jasmine": "^3.5.14",
-    "@types/jasminewd2": "^2.0.8",
-    "@types/node": "^14.6.4",
-    "codelyzer": "^6.0.1",
-    "gh-pages": "^3.1.0",
-    "jasmine-core": "^3.6.0",
-    "jasmine-spec-reporter": "^5.0.2",
-    "karma": "^5.2.1",
-    "karma-chrome-launcher": "^3.1.0",
-    "karma-coverage-istanbul-reporter": "^3.0.3",
-    "karma-jasmine": "^4.0.1",
-    "karma-jasmine-html-reporter": "^1.5.4",
-    "ng-packagr": "^10.1.0",
-    "protractor": "^7.0.0",
-    "puppeteer": "^5.2.1",
-    "ts-node": "^9.0.0",
-    "tslint": "^6.1.3",
-    "typescript": "~3.9.7"
-  }
+  "keywords": [
+    "angular",
+    "stl",
+    "threejs",
+    "three",
+    "webGL",
+    "component",
+    "viewer"
+  ],
+  "main": "bundles/angular-stl-model-viewer.umd.js",
+  "module": "fesm2015/angular-stl-model-viewer.js",
+  "es2015": "fesm2015/angular-stl-model-viewer.js",
+  "esm2015": "esm2015/angular-stl-model-viewer.js",
+  "fesm2015": "fesm2015/angular-stl-model-viewer.js",
+  "typings": "angular-stl-model-viewer.d.ts",
+  "metadata": "angular-stl-model-viewer.metadata.json",
+  "sideEffects": false
 }

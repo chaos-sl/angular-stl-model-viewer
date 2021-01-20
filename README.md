@@ -1,61 +1,24 @@
-angular-stl-model-viewer
-==
+# AngularStlModelViewer
 
-This is an angular component to render stl-models with THREE.js.
+This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.1.9.
 
-Installation
-==
-- `yarn add angular-stl-model-viewer`
-- `npm install angular-stl-model-viewer`
+## Code scaffolding
 
-Usage
-==
-- import `StlModelViewerModule` to your app module
-- use stl-model-viewer component in your html `<stl-model-viewer [stlModels]="['example.stl']"></stl-model-viewer>`
+Run `ng generate component component-name --project angular-stl-model-viewer` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project angular-stl-model-viewer`.
+> Note: Don't forget to add `--project angular-stl-model-viewer` or else it will be added to the default project in your `angular.json` file. 
 
+## Build
 
-Example
-=
+Run `ng build angular-stl-model-viewer` to build the project. The build artifacts will be stored in the `dist/` directory.
 
-The working basic example can be found in our [live demo][live-demo].
+## Publishing
 
-Configuration
-==
-## Input Properties
-| Attr         | Type                   | Default                                                                          | Details                                            |
-| ------------ | ---------------------- | -------------------------------------------------------------------------------- |--------------------------------------------------- |
-| stlModels     | string[]                 | -                                                                                | List of stl model paths                                  |
-| hasControls  | boolean                | true                                                                             | If true, the user can interact with the stl-models  |
-| camera       | THREE.Camera           | THREE.PerspectiveCamera( 35, WindowInnerWidth / WindowInnerHeight, 1, 15 )       | The projection mode used for rendering the scene   |
-| cameraTarget | THREE.Vector3          | THREE.Vector3( 0, 0, 0 )                                                         | The orientation point for the camera               |
-| light        | THREE.Light            | THREE.PointLight( 0xffffff )                                                     | Illuminates the scene                              |
-| material     | THREE.MeshMaterialType | THREE.MeshPhongMaterial({ color: 0xc4c4c4, shininess: 100, specular: 0x111111 }) | Casts more precisely the possible materials assignable to a [                                                                                                                                [Mesh]] object |
-| scene        | THREE.Scene            | THREE.Scene()                                                                    | Scenes allow you to set up what and where is to be rendered by                                                                                                                               three.js. This is where you place objects, lights and cameras |
-| renderer     | THREE.WebGLRenderer    | THREE.WebGLRenderer({ antialias: true })                                         | Displays your beautifully crafted scenes using WebGL |
-| controls     | THREE.OrbitControls    | THREE.OrbitControls                                                              | Allow the camera to orbit around a target          |
-| meshOptions  | MeshOptions[]            | []                                                                               | customize mesh options per stl-model                                                  |
+After building your library with `ng build angular-stl-model-viewer`, go to the dist folder `cd dist/angular-stl-model-viewer` and run `npm publish`.
 
-## Output Events
-| Attr       | Details                                  |
-| ---------- | ---------------------------------------- |
-| rendered   |  Emitted when the stl-model is rendered. |
+## Running unit tests
 
+Run `ng test angular-stl-model-viewer` to execute the unit tests via [Karma](https://karma-runner.github.io).
 
-## MeshOptionsType
+## Further help
 
-| Attr          | Type                 | Default                         | Details                                 |
-| ------------- | -------------------- | ------------------------------- | --------------------------------------- |
-| castShadow    | boolean              | true                            | Gets rendered into shadow map |
-| position      | THREE.Vector3        | THREE.Vector3( 0, 0, 0 )          | Object's local position |
-| receiveShadow | boolean              | true                            | Material gets baked in shadow receiving |
-| scale         | THREE.Vector3        | THREE.Vector3( 0.03, 0.03, 0.03 ) | Object's local scale |
-| up            | THREE.Vector3        | -                               | Up direction |
-| userData      | {[key: string]: any} | -                               | An object that can be used to store custom data about the Object3d. It should not hold references to functions as                                                                            these will not be cloned |
-| visible       | boolean              | -                               | Object gets rendered if true |
-
-Contributing
-===
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using `yarn lint` and `yarn test`.
-
-
-[live-demo]: https://codaline-io.github.io/angular-stl-model-viewer
+To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
