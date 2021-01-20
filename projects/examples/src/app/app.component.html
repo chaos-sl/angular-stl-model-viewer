@@ -18,3 +18,12 @@
   <button (click)="zoom(0)">ZoomIn</button>
   <button (click)="zoom(1)">ZoomOut</button>
 </div>
+
+<div
+  class="drop-area"
+  (dragover)="$event.preventDefault()"
+  (dragenter)="$event.preventDefault()"
+  (drop)="dropFile($event)"
+>
+  Hello,Drop stl file here you will see snapshot
+</div>

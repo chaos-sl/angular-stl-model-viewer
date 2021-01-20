@@ -1,8 +1,9 @@
-import { Component, ViewChildren, QueryList } from '@angular/core';
+import { Component, ViewChildren, QueryList, OnInit } from '@angular/core';
 import {
   StlModelViewerComponent,
   RotateDirection,
   ZoomDirection,
+  StlSnapshotService,
 } from '../../../angular-stl-model-viewer/src/public-api';
 
 @Component({
@@ -15,9 +16,8 @@ export class AppComponent {
   private peterUp = true;
   upModels = ['./assets/peter.stl'];
   downModels = ['./assets/strap.stl'];
-  @ViewChildren(StlModelViewerComponent) viewers: QueryList<
-    StlModelViewerComponent
-  >;
+  @ViewChildren(StlModelViewerComponent)
+  viewers: QueryList<StlModelViewerComponent>;
 
   switchPosition() {
     this.peterUp = !this.peterUp;
@@ -36,6 +36,34 @@ export class AppComponent {
   zoom(direction: ZoomDirection) {
     for (const viewer of this.viewers) {
       viewer.zoom(direction, 5);
+    }
+  }
+
+  dropFile(event: DragEvent) {
+    console.debug(event);
+    console.debug(typeof event);
+    event.preventDefault();
+    if (event.dataTransfer.files.length) {
+      Promise.all(
+        Array.from(event.dataTransfer.files).map((file, idx) =>
+          new StlSnapshotService(file, 5).snapshot((data) => {
+            const link = document.createElement('a');
+            link.setAttribute('download', '' + idx + file.name);
+            link.setAttribute('href', 'data:image/octet-stream;base64,' + data);
+            document.body.appendChild(link);
+            link.click();
+          })
+        )
+      ).then((results) => {
+        event.target['innerHTML'] = results
+          .map((result) =>
+            result.images.map(
+              (img) =>
+                `<img src='${img}' width="${result.sideLength}px" height="${result.sideLength}px"/>`
+            )
+          )
+          .reduce((acc, v) => acc.concat(v), []);
+      });
     }
   }
 }

@@ -1,10 +1,9 @@
-import { NgModule } from '@angular/core'
-import { StlModelViewerComponent } from './angular-stl-model-viewer.component'
+import { NgModule } from '@angular/core';
+import { StlModelViewerComponent } from './angular-stl-model-viewer.component';
 
 @NgModule({
   declarations: [StlModelViewerComponent],
   exports: [StlModelViewerComponent],
-  imports: [
-  ]
+  imports: [],
 })
-export class StlModelViewerModule { }
+export class StlModelViewerModule {}
