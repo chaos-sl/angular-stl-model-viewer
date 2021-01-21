@@ -43,16 +43,17 @@ export class StlSnapshotService {
   lights = new THREE.Group();
   geometry: BufferGeometry;
   sideLength = 0;
-  constructor(private file: File, private ppmm: number) {}
-  snapshot(fileSave?: (data: string) => void): Promise<SnapShotResult> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as ArrayBuffer);
-      reader.readAsArrayBuffer(this.file);
-    }).then((data: ArrayBuffer) => {
-      this.init(data);
-      return this.shot(fileSave);
-    });
+  constructor(private file: File | ArrayBuffer, private ppmm: number) {}
+  async snapshot(fileSave?: (data: string) => void): Promise<SnapShotResult> {
+    if (this.file instanceof File) {
+      this.file = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as ArrayBuffer);
+        reader.readAsArrayBuffer(this.file as File);
+      });
+    }
+    this.init(this.file as ArrayBuffer);
+    return this.shot(fileSave);
   }
   private init(data: ArrayBuffer) {
     this.geometry = this.stlLoader.parse(data);
