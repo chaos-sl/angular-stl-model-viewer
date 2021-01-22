@@ -74,7 +74,7 @@ function isWebGLAvailable() {
 })
 export class StlModelViewerComponent implements OnInit, OnDestroy {
   private _models = [];
-  @Input() set stlModels(models: string[]) {
+  @Input() set stlModels(models: (string | ArrayBuffer)[]) {
     this._models = models;
     this.refreshMeshGroup();
   }
@@ -291,9 +291,11 @@ export class StlModelViewerComponent implements OnInit, OnDestroy {
 
   async refreshMeshGroup() {
     this.meshGroup.remove(...this.meshGroup.children);
-    const meshCreations = this.stlModels.map((modelPath, index) => {
-      return this.createMesh(modelPath, this.meshOptions[index]);
-    });
+    const meshCreations = this.stlModels
+      .filter((x) => x)
+      .map((modelPath, index) => {
+        return this.createMesh(modelPath, this.meshOptions[index]);
+      });
     const meshes: THREE.Object3D[] = await Promise.all(meshCreations);
 
     meshes.map((mesh) => this.meshGroup.add(mesh));
@@ -301,10 +303,14 @@ export class StlModelViewerComponent implements OnInit, OnDestroy {
   }
 
   async createMesh(
-    path: string,
+    path: string | ArrayBuffer,
     meshOptions: MeshOptions = {}
   ): Promise<THREE.Mesh> {
-    const geometry: THREE.BufferGeometry = await this.stlLoader.loadAsync(path);
+    const geometry: THREE.BufferGeometry =
+      typeof path === 'string'
+        ? await this.stlLoader.loadAsync(path)
+        : await this.stlLoader.parse(path);
+
     geometry.computeBoundingBox();
     geometry.center();
     const { x, y, z } = geometry.boundingBox.max;

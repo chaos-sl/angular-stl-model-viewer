@@ -15,7 +15,7 @@ export class AppComponent {
   title = 'Examples';
   private peterUp = true;
   upModels = ['./assets/peter.stl'];
-  downModels = ['./assets/strap.stl'];
+  downModels: (string | ArrayBuffer)[] = ['./assets/strap.stl'];
   @ViewChildren(StlModelViewerComponent)
   viewers: QueryList<StlModelViewerComponent>;
 
@@ -45,15 +45,18 @@ export class AppComponent {
     event.preventDefault();
     if (event.dataTransfer.files.length) {
       Promise.all(
-        Array.from(event.dataTransfer.files).map((file, idx) =>
-          new StlSnapshotService(file, 5).snapshot((data) => {
+        Array.from(event.dataTransfer.files).map(async (file, idx) => {
+          const snapshot = new StlSnapshotService(file, 5);
+          const arrayBuffer = await snapshot.read();
+          this.downModels = [...this.downModels, arrayBuffer];
+          return snapshot.snapshot((data) => {
             const link = document.createElement('a');
-            link.setAttribute('download', '' + idx + file.name);
+            link.setAttribute('download', '' + idx + file.name + '.png');
             link.setAttribute('href', 'data:image/octet-stream;base64,' + data);
             document.body.appendChild(link);
             link.click();
-          })
-        )
+          });
+        })
       ).then((results) => {
         event.target['innerHTML'] = results
           .map((result) =>

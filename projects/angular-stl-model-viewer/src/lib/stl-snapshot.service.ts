@@ -44,7 +44,7 @@ export class StlSnapshotService {
   geometry: BufferGeometry;
   sideLength = 0;
   constructor(private file: File | ArrayBuffer, private ppmm: number) {}
-  async snapshot(fileSave?: (data: string) => void): Promise<SnapShotResult> {
+  async read(): Promise<ArrayBuffer> {
     if (this.file instanceof File) {
       this.file = await new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -52,7 +52,10 @@ export class StlSnapshotService {
         reader.readAsArrayBuffer(this.file as File);
       });
     }
-    this.init(this.file as ArrayBuffer);
+    return this.file as ArrayBuffer;
+  }
+  async snapshot(fileSave?: (data: string) => void): Promise<SnapShotResult> {
+    this.init(await this.read());
     return this.shot(fileSave);
   }
   private init(data: ArrayBuffer) {
