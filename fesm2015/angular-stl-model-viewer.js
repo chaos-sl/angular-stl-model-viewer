@@ -332,15 +332,24 @@ const MATERIAL_0 = (color = 0xffffff) => new MeshPhongMaterial({
     wireframe: false,
 });
 const LIGHT_0 = new AmbientLight(0xffffff, 0.3);
-const LIGHT_1 = new DirectionalLight(0xffffff, 0.2);
+const LIGHT_1 = new DirectionalLight(0xffffff, 0.15);
 LIGHT_1.position.set(-100, -100, 100);
 LIGHT_1.lookAt(new Vector3(0, 0, 0));
-const LIGHT_2 = new DirectionalLight(0xffffff, 0.2);
-LIGHT_2.position.set(100, 0, 0);
+const LIGHT_2 = new DirectionalLight(0xffffff, 0.15);
+LIGHT_2.position.set(100, -100, -100);
 LIGHT_2.lookAt(new Vector3(0, 0, 0));
-const LIGHT_3 = new DirectionalLight(0xffffff, 0.2);
-LIGHT_3.position.set(-20, 100, 0);
+const LIGHT_3 = new DirectionalLight(0xffffff, 0.15);
+LIGHT_3.position.set(-100, 100, -100);
 LIGHT_3.lookAt(new Vector3(0, 0, 0));
+const LIGHT_5 = new DirectionalLight(0xffffff, 0.15);
+LIGHT_5.position.set(-100, 100, 100);
+LIGHT_5.lookAt(new Vector3(0, 0, 0));
+const LIGHT_6 = new DirectionalLight(0xffffff, 0.15);
+LIGHT_6.position.set(100, -100, 100);
+LIGHT_6.lookAt(new Vector3(0, 0, 0));
+const LIGHT_7 = new DirectionalLight(0xffffff, 0.15);
+LIGHT_7.position.set(100, 100, -100);
+LIGHT_7.lookAt(new Vector3(0, 0, 0));
 const LIGHT_4 = new DirectionalLight(0xffffff, 0.4);
 LIGHT_4.position.set(50, 50, 0);
 LIGHT_4.lookAt(new Vector3(-100, 0, 0));
@@ -382,7 +391,6 @@ class StlSnapshotService {
         const { x, y, z } = this.geometry.boundingBox.max;
         this.distance = Math.max(x, y, z) * 10;
         const { center, radius } = this.geometry.boundingSphere;
-        console.debug(center, radius, x, y, z);
         this.center = center;
         this.sideLength = radius * 2;
         this.canvas.height = this.canvas.width = this.sideLength * this.ppmm;
@@ -394,7 +402,7 @@ class StlSnapshotService {
         this.camera = new PerspectiveCamera(15, 1);
         this.camera.position.set(0, this.distance, 0);
         this.camera.lookAt(center);
-        this.lights.add(LIGHT_0, LIGHT_1, LIGHT_2, LIGHT_3);
+        this.lights.add(LIGHT_0, LIGHT_1, LIGHT_2, LIGHT_3, LIGHT_5, LIGHT_6, LIGHT_7);
         this.camera.add(LIGHT_4);
         const mesh = new Mesh(this.geometry, MATERIAL_0(0xffffff));
         mesh.rotateOnWorldAxis(new Vector3(0, 1, 0), -Math.PI / 2);
