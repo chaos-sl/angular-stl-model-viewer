@@ -1,5 +1,5 @@
 <h1>{{ title }}</h1>
-<div>
+<div style="display: flex">
   <stl-model-viewer
     [meshOptions]="[{ position: { x: 0, y: 0, z: 0 } }]"
     [stlModels]="upModels"
@@ -25,5 +25,5 @@
   (dragenter)="$event.preventDefault()"
   (drop)="dropFile($event)"
 >
-  Hello,Drop stl file here you will see snapshot
+  <span> Hello,Drop stl file here you will see snapshot </span>
 </div>

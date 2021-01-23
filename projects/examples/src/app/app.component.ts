@@ -8,7 +8,7 @@ import {
 
 @Component({
   selector: 'app-root',
-  styleUrls: ['./app.component.css'],
+  styleUrls: ['./app.component.scss'],
   templateUrl: './app.component.html',
 })
 export class AppComponent {
@@ -46,15 +46,15 @@ export class AppComponent {
     if (event.dataTransfer.files.length) {
       Promise.all(
         Array.from(event.dataTransfer.files).map(async (file, idx) => {
-          const snapshot = new StlSnapshotService(file, 5);
+          const snapshot = new StlSnapshotService(file, 15);
           const arrayBuffer = await snapshot.read();
           this.downModels = [...this.downModels, arrayBuffer];
           return snapshot.snapshot((data) => {
-            const link = document.createElement('a');
-            link.setAttribute('download', '' + idx + file.name + '.png');
-            link.setAttribute('href', 'data:image/octet-stream;base64,' + data);
-            document.body.appendChild(link);
-            link.click();
+            // const link = document.createElement('a');
+            // link.setAttribute('download', '' + idx + file.name + '.png');
+            // link.setAttribute('href', 'data:image/octet-stream;base64,' + data);
+            // document.body.appendChild(link);
+            // link.click();
           });
         })
       ).then((results) => {
@@ -62,7 +62,7 @@ export class AppComponent {
           .map((result) =>
             result.images.map(
               (img) =>
-                `<img src='${img}' width="${result.sideLength}px" height="${result.sideLength}px"/>`
+                `<img src='${img}' style="object-fit:contain;" />`
             )
           )
           .reduce((acc, v) => acc.concat(v), []);
