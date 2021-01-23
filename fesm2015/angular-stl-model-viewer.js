@@ -1,5 +1,5 @@
 import { __awaiter } from 'tslib';
-import { EventEmitter, Component, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef, NgZone, Input, Output, NgModule } from '@angular/core';
+import { EventEmitter, ɵɵdirectiveInject, ChangeDetectorRef, ElementRef, NgZone, ɵɵdefineComponent, ɵsetClassMetadata, Component, ChangeDetectionStrategy, Input, Output, ɵɵdefineNgModule, ɵɵdefineInjector, ɵɵsetNgModuleScope, NgModule } from '@angular/core';
 import { Vector3, PerspectiveCamera, DirectionalLight, MeshPhongMaterial, Scene, WebGLRenderer, Object3D, LightProbe, Color, CubeTextureLoader, sRGBEncoding, MeshStandardMaterial, Mesh, DoubleSide, AmbientLight, Group, OrthographicCamera } from 'three';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -225,7 +225,9 @@ class StlModelViewerComponent {
     refreshMeshGroup() {
         return __awaiter(this, void 0, void 0, function* () {
             this.meshGroup.remove(...this.meshGroup.children);
-            const meshCreations = this.stlModels.map((modelPath, index) => {
+            const meshCreations = this.stlModels
+                .filter((x) => x)
+                .map((modelPath, index) => {
                 return this.createMesh(modelPath, this.meshOptions[index]);
             });
             const meshes = yield Promise.all(meshCreations);
@@ -235,7 +237,9 @@ class StlModelViewerComponent {
     }
     createMesh(path, meshOptions = {}) {
         return __awaiter(this, void 0, void 0, function* () {
-            const geometry = yield this.stlLoader.loadAsync(path);
+            const geometry = typeof path === 'string'
+                ? yield this.stlLoader.loadAsync(path)
+                : yield this.stlLoader.parse(path);
             geometry.computeBoundingBox();
             geometry.center();
             const { x, y, z } = geometry.boundingBox.max;
@@ -265,48 +269,61 @@ class StlModelViewerComponent {
         this.renderer.setSize(width, height);
     }
 }
-StlModelViewerComponent.decorators = [
-    { type: Component, args: [{
+StlModelViewerComponent.ɵfac = function StlModelViewerComponent_Factory(t) { return new (t || StlModelViewerComponent)(ɵɵdirectiveInject(ChangeDetectorRef), ɵɵdirectiveInject(ElementRef), ɵɵdirectiveInject(NgZone)); };
+StlModelViewerComponent.ɵcmp = ɵɵdefineComponent({ type: StlModelViewerComponent, selectors: [["stl-model-viewer"]], inputs: { stlModels: "stlModels", hasControls: "hasControls", camera: "camera", cameraTarget: "cameraTarget", light: "light", material: "material", scene: "scene", renderer: "renderer", controls: "controls", meshOptions: "meshOptions" }, outputs: { rendered: "rendered" }, decls: 0, vars: 0, template: function StlModelViewerComponent_Template(rf, ctx) { }, styles: ["[_nghost-%COMP%] {\n        width: 100%\n        height: 100%\n        display: block\n      }"], changeDetection: 0 });
+/*@__PURE__*/ (function () { ɵsetClassMetadata(StlModelViewerComponent, [{
+        type: Component,
+        args: [{
                 changeDetection: ChangeDetectionStrategy.OnPush,
                 selector: 'stl-model-viewer',
-                template: '',
-                styles: [`
+                styles: [
+                    `
       :host {
         width: 100%
         height: 100%
         display: block
       }
-    `]
-            },] }
-];
-StlModelViewerComponent.ctorParameters = () => [
-    { type: ChangeDetectorRef },
-    { type: ElementRef },
-    { type: NgZone }
-];
-StlModelViewerComponent.propDecorators = {
-    stlModels: [{ type: Input }],
-    hasControls: [{ type: Input }],
-    camera: [{ type: Input }],
-    cameraTarget: [{ type: Input }],
-    light: [{ type: Input }],
-    material: [{ type: Input }],
-    scene: [{ type: Input }],
-    renderer: [{ type: Input }],
-    controls: [{ type: Input }],
-    meshOptions: [{ type: Input }],
-    rendered: [{ type: Output }]
-};
+    `,
+                ],
+                template: '',
+            }]
+    }], function () { return [{ type: ChangeDetectorRef }, { type: ElementRef }, { type: NgZone }]; }, { stlModels: [{
+            type: Input
+        }], hasControls: [{
+            type: Input
+        }], camera: [{
+            type: Input
+        }], cameraTarget: [{
+            type: Input
+        }], light: [{
+            type: Input
+        }], material: [{
+            type: Input
+        }], scene: [{
+            type: Input
+        }], renderer: [{
+            type: Input
+        }], controls: [{
+            type: Input
+        }], meshOptions: [{
+            type: Input
+        }], rendered: [{
+            type: Output
+        }] }); })();
 
 class StlModelViewerModule {
 }
-StlModelViewerModule.decorators = [
-    { type: NgModule, args: [{
+StlModelViewerModule.ɵmod = ɵɵdefineNgModule({ type: StlModelViewerModule });
+StlModelViewerModule.ɵinj = ɵɵdefineInjector({ factory: function StlModelViewerModule_Factory(t) { return new (t || StlModelViewerModule)(); }, imports: [[]] });
+(function () { (typeof ngJitMode === "undefined" || ngJitMode) && ɵɵsetNgModuleScope(StlModelViewerModule, { declarations: [StlModelViewerComponent], exports: [StlModelViewerComponent] }); })();
+/*@__PURE__*/ (function () { ɵsetClassMetadata(StlModelViewerModule, [{
+        type: NgModule,
+        args: [{
                 declarations: [StlModelViewerComponent],
                 exports: [StlModelViewerComponent],
                 imports: [],
-            },] }
-];
+            }]
+    }], null, null); })();
 
 const MATERIAL_0 = (color = 0xffffff) => new MeshPhongMaterial({
     color,
@@ -314,7 +331,6 @@ const MATERIAL_0 = (color = 0xffffff) => new MeshPhongMaterial({
     side: DoubleSide,
     wireframe: false,
 });
-const ɵ0 = MATERIAL_0;
 const LIGHT_0 = new AmbientLight(0xffffff, 0.3);
 const LIGHT_1 = new DirectionalLight(0xffffff, 0.2);
 LIGHT_1.position.set(-100, -100, 100);
@@ -344,13 +360,21 @@ class StlSnapshotService {
         this.lights = new Group();
         this.sideLength = 0;
     }
+    read() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.file instanceof File) {
+                this.file = yield new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.readAsArrayBuffer(this.file);
+                });
+            }
+            return this.file;
+        });
+    }
     snapshot(fileSave) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.readAsArrayBuffer(this.file);
-        }).then((data) => {
-            this.init(data);
+        return __awaiter(this, void 0, void 0, function* () {
+            this.init(yield this.read());
             return this.shot(fileSave);
         });
     }
@@ -408,5 +432,5 @@ class StlSnapshotService {
  * Generated bundle index. Do not edit.
  */
 
-export { RotateDirection, StlModelViewerComponent, StlModelViewerModule, StlSnapshotService, ZoomDirection, ɵ0 };
+export { RotateDirection, StlModelViewerComponent, StlModelViewerModule, StlSnapshotService, ZoomDirection };
 //# sourceMappingURL=angular-stl-model-viewer.js.map

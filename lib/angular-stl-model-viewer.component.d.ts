@@ -1,6 +1,7 @@
 import { ElementRef, EventEmitter, NgZone, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
 import * as THREE from 'three';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
+import * as i0 from "@angular/core";
 export declare enum RotateDirection {
     up = 0,
     right = 1,
@@ -28,8 +29,8 @@ export declare class StlModelViewerComponent implements OnInit, OnDestroy {
     private eleRef;
     private ngZone;
     private _models;
-    set stlModels(models: string[]);
-    get stlModels(): string[];
+    set stlModels(models: (string | ArrayBuffer)[]);
+    get stlModels(): (string | ArrayBuffer)[];
     hasControls: boolean;
     camera: THREE.PerspectiveCamera;
     cameraTarget: THREE.Vector3;
@@ -59,8 +60,10 @@ export declare class StlModelViewerComponent implements OnInit, OnDestroy {
     rotate(direction: RotateDirection, stepCount?: number): void;
     private init;
     refreshMeshGroup(): Promise<void>;
-    createMesh(path: string, meshOptions?: MeshOptions): Promise<THREE.Mesh>;
+    createMesh(path: string | ArrayBuffer, meshOptions?: MeshOptions): Promise<THREE.Mesh>;
     render: () => void;
     setSizes(): void;
     onWindowResize: () => void;
+    static ɵfac: i0.ɵɵFactoryDef<StlModelViewerComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDefWithMeta<StlModelViewerComponent, "stl-model-viewer", never, { "stlModels": "stlModels"; "hasControls": "hasControls"; "camera": "camera"; "cameraTarget": "cameraTarget"; "light": "light"; "material": "material"; "scene": "scene"; "renderer": "renderer"; "controls": "controls"; "meshOptions": "meshOptions"; }, { "rendered": "rendered"; }, never, never>;
 }

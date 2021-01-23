@@ -2,7 +2,7 @@
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@angular/core'), require('three'), require('three/examples/jsm/loaders/STLLoader'), require('three/examples/jsm/controls/OrbitControls'), require('three/examples/jsm/lights/LightProbeGenerator.js')) :
     typeof define === 'function' && define.amd ? define('angular-stl-model-viewer', ['exports', '@angular/core', 'three', 'three/examples/jsm/loaders/STLLoader', 'three/examples/jsm/controls/OrbitControls', 'three/examples/jsm/lights/LightProbeGenerator.js'], factory) :
     (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global['angular-stl-model-viewer'] = {}, global.ng.core, global.THREE, global.STLLoader, global.OrbitControls, global.LightProbeGenerator_js));
-}(this, (function (exports, core, THREE, STLLoader, OrbitControls, LightProbeGenerator_js) { 'use strict';
+}(this, (function (exports, i0, THREE, STLLoader, OrbitControls, LightProbeGenerator_js) { 'use strict';
 
     /*! *****************************************************************************
     Copyright (c) Microsoft Corporation.
@@ -354,7 +354,7 @@
             });
             this.controls = null;
             this.meshOptions = [];
-            this.rendered = new core.EventEmitter();
+            this.rendered = new i0.EventEmitter();
             this.xzAngle = 0; // Azimuthal angle
             this.yzAngle = 0; // Polar angle
             this.distance = 10; // PerspectiveCamera distance
@@ -547,7 +547,9 @@
                     switch (_b.label) {
                         case 0:
                             (_a = this.meshGroup).remove.apply(_a, __spread(this.meshGroup.children));
-                            meshCreations = this.stlModels.map(function (modelPath, index) {
+                            meshCreations = this.stlModels
+                                .filter(function (x) { return x; })
+                                .map(function (modelPath, index) {
                                 return _this.createMesh(modelPath, _this.meshOptions[index]);
                             });
                             return [4 /*yield*/, Promise.all(meshCreations)];
@@ -563,15 +565,24 @@
         StlModelViewerComponent.prototype.createMesh = function (path, meshOptions) {
             if (meshOptions === void 0) { meshOptions = {}; }
             return __awaiter(this, void 0, void 0, function () {
-                var geometry, _a, x, y, z, mesh, vectorOptions, options;
-                return __generator(this, function (_b) {
-                    switch (_b.label) {
-                        case 0: return [4 /*yield*/, this.stlLoader.loadAsync(path)];
+                var geometry, _a, _b, x, y, z, mesh, vectorOptions, options;
+                return __generator(this, function (_c) {
+                    switch (_c.label) {
+                        case 0:
+                            if (!(typeof path === 'string')) return [3 /*break*/, 2];
+                            return [4 /*yield*/, this.stlLoader.loadAsync(path)];
                         case 1:
-                            geometry = _b.sent();
+                            _a = _c.sent();
+                            return [3 /*break*/, 4];
+                        case 2: return [4 /*yield*/, this.stlLoader.parse(path)];
+                        case 3:
+                            _a = _c.sent();
+                            _c.label = 4;
+                        case 4:
+                            geometry = _a;
                             geometry.computeBoundingBox();
                             geometry.center();
-                            _a = geometry.boundingBox.max, x = _a.x, y = _a.y, z = _a.z;
+                            _b = geometry.boundingBox.max, x = _b.x, y = _b.y, z = _b.z;
                             this.distance = Math.max(x, y, z) * 10;
                             mesh = new THREE.Mesh(geometry, this.material);
                             mesh.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), -Math.PI / 2);
@@ -601,45 +612,62 @@
         };
         return StlModelViewerComponent;
     }());
-    StlModelViewerComponent.decorators = [
-        { type: core.Component, args: [{
-                    changeDetection: core.ChangeDetectionStrategy.OnPush,
-                    selector: 'stl-model-viewer',
-                    template: '',
-                    styles: ["\n      :host {\n        width: 100%\n        height: 100%\n        display: block\n      }\n    "]
-                },] }
-    ];
-    StlModelViewerComponent.ctorParameters = function () { return [
-        { type: core.ChangeDetectorRef },
-        { type: core.ElementRef },
-        { type: core.NgZone }
-    ]; };
-    StlModelViewerComponent.propDecorators = {
-        stlModels: [{ type: core.Input }],
-        hasControls: [{ type: core.Input }],
-        camera: [{ type: core.Input }],
-        cameraTarget: [{ type: core.Input }],
-        light: [{ type: core.Input }],
-        material: [{ type: core.Input }],
-        scene: [{ type: core.Input }],
-        renderer: [{ type: core.Input }],
-        controls: [{ type: core.Input }],
-        meshOptions: [{ type: core.Input }],
-        rendered: [{ type: core.Output }]
-    };
+    StlModelViewerComponent.ɵfac = function StlModelViewerComponent_Factory(t) { return new (t || StlModelViewerComponent)(i0.ɵɵdirectiveInject(i0.ChangeDetectorRef), i0.ɵɵdirectiveInject(i0.ElementRef), i0.ɵɵdirectiveInject(i0.NgZone)); };
+    StlModelViewerComponent.ɵcmp = i0.ɵɵdefineComponent({ type: StlModelViewerComponent, selectors: [["stl-model-viewer"]], inputs: { stlModels: "stlModels", hasControls: "hasControls", camera: "camera", cameraTarget: "cameraTarget", light: "light", material: "material", scene: "scene", renderer: "renderer", controls: "controls", meshOptions: "meshOptions" }, outputs: { rendered: "rendered" }, decls: 0, vars: 0, template: function StlModelViewerComponent_Template(rf, ctx) { }, styles: ["[_nghost-%COMP%] {\n        width: 100%\n        height: 100%\n        display: block\n      }"], changeDetection: 0 });
+    /*@__PURE__*/ (function () {
+        i0.ɵsetClassMetadata(StlModelViewerComponent, [{
+                type: i0.Component,
+                args: [{
+                        changeDetection: i0.ChangeDetectionStrategy.OnPush,
+                        selector: 'stl-model-viewer',
+                        styles: [
+                            "\n      :host {\n        width: 100%\n        height: 100%\n        display: block\n      }\n    ",
+                        ],
+                        template: '',
+                    }]
+            }], function () { return [{ type: i0.ChangeDetectorRef }, { type: i0.ElementRef }, { type: i0.NgZone }]; }, { stlModels: [{
+                    type: i0.Input
+                }], hasControls: [{
+                    type: i0.Input
+                }], camera: [{
+                    type: i0.Input
+                }], cameraTarget: [{
+                    type: i0.Input
+                }], light: [{
+                    type: i0.Input
+                }], material: [{
+                    type: i0.Input
+                }], scene: [{
+                    type: i0.Input
+                }], renderer: [{
+                    type: i0.Input
+                }], controls: [{
+                    type: i0.Input
+                }], meshOptions: [{
+                    type: i0.Input
+                }], rendered: [{
+                    type: i0.Output
+                }] });
+    })();
 
     var StlModelViewerModule = /** @class */ (function () {
         function StlModelViewerModule() {
         }
         return StlModelViewerModule;
     }());
-    StlModelViewerModule.decorators = [
-        { type: core.NgModule, args: [{
-                    declarations: [StlModelViewerComponent],
-                    exports: [StlModelViewerComponent],
-                    imports: [],
-                },] }
-    ];
+    StlModelViewerModule.ɵmod = i0.ɵɵdefineNgModule({ type: StlModelViewerModule });
+    StlModelViewerModule.ɵinj = i0.ɵɵdefineInjector({ factory: function StlModelViewerModule_Factory(t) { return new (t || StlModelViewerModule)(); }, imports: [[]] });
+    (function () { (typeof ngJitMode === "undefined" || ngJitMode) && i0.ɵɵsetNgModuleScope(StlModelViewerModule, { declarations: [StlModelViewerComponent], exports: [StlModelViewerComponent] }); })();
+    /*@__PURE__*/ (function () {
+        i0.ɵsetClassMetadata(StlModelViewerModule, [{
+                type: i0.NgModule,
+                args: [{
+                        declarations: [StlModelViewerComponent],
+                        exports: [StlModelViewerComponent],
+                        imports: [],
+                    }]
+            }], null, null);
+    })();
 
     var MATERIAL_0 = function (color) {
         if (color === void 0) { color = 0xffffff; }
@@ -650,7 +678,6 @@
             wireframe: false,
         });
     };
-    var ɵ0 = MATERIAL_0;
     var LIGHT_0 = new THREE.AmbientLight(0xffffff, 0.3);
     var LIGHT_1 = new THREE.DirectionalLight(0xffffff, 0.2);
     LIGHT_1.position.set(-100, -100, 100);
@@ -680,15 +707,41 @@
             this.lights = new THREE.Group();
             this.sideLength = 0;
         }
+        StlSnapshotService.prototype.read = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var _a;
+                var _this = this;
+                return __generator(this, function (_b) {
+                    switch (_b.label) {
+                        case 0:
+                            if (!(this.file instanceof File)) return [3 /*break*/, 2];
+                            _a = this;
+                            return [4 /*yield*/, new Promise(function (resolve, reject) {
+                                    var reader = new FileReader();
+                                    reader.onload = function () { return resolve(reader.result); };
+                                    reader.readAsArrayBuffer(_this.file);
+                                })];
+                        case 1:
+                            _a.file = _b.sent();
+                            _b.label = 2;
+                        case 2: return [2 /*return*/, this.file];
+                    }
+                });
+            });
+        };
         StlSnapshotService.prototype.snapshot = function (fileSave) {
-            var _this = this;
-            return new Promise(function (resolve, reject) {
-                var reader = new FileReader();
-                reader.onload = function () { return resolve(reader.result); };
-                reader.readAsArrayBuffer(_this.file);
-            }).then(function (data) {
-                _this.init(data);
-                return _this.shot(fileSave);
+            return __awaiter(this, void 0, void 0, function () {
+                var _a;
+                return __generator(this, function (_b) {
+                    switch (_b.label) {
+                        case 0:
+                            _a = this.init;
+                            return [4 /*yield*/, this.read()];
+                        case 1:
+                            _a.apply(this, [_b.sent()]);
+                            return [2 /*return*/, this.shot(fileSave)];
+                    }
+                });
             });
         };
         StlSnapshotService.prototype.init = function (data) {
@@ -760,7 +813,6 @@
     exports.StlModelViewerComponent = StlModelViewerComponent;
     exports.StlModelViewerModule = StlModelViewerModule;
     exports.StlSnapshotService = StlSnapshotService;
-    exports.ɵ0 = ɵ0;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 

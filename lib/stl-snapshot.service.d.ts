@@ -18,7 +18,8 @@ export declare class StlSnapshotService {
     lights: THREE.Group;
     geometry: BufferGeometry;
     sideLength: number;
-    constructor(file: File, ppmm: number);
+    constructor(file: File | ArrayBuffer, ppmm: number);
+    read(): Promise<ArrayBuffer>;
     snapshot(fileSave?: (data: string) => void): Promise<SnapShotResult>;
     private init;
     private shot;
