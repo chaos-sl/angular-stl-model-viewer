@@ -11,13 +11,15 @@ export declare class StlSnapshotService {
     private ppmm;
     canvas: HTMLCanvasElement;
     renderer: THREE.WebGLRenderer;
-    camera: THREE.OrthographicCamera;
+    camera: THREE.PerspectiveCamera;
     stlLoader: STLLoader;
     scene: THREE.Scene;
     objects: THREE.Group;
     lights: THREE.Group;
     geometry: BufferGeometry;
     sideLength: number;
+    distance: number;
+    center: THREE.Vector3;
     constructor(file: File | ArrayBuffer, ppmm: number);
     read(): Promise<ArrayBuffer>;
     snapshot(fileSave?: (data: string) => void): Promise<SnapShotResult>;

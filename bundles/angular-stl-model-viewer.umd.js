@@ -696,16 +696,12 @@
             this.file = file;
             this.ppmm = ppmm;
             this.canvas = document.createElement('canvas');
-            this.renderer = new THREE.WebGLRenderer({
-                alpha: true,
-                antialias: true,
-                canvas: this.canvas,
-            });
             this.stlLoader = new STLLoader.STLLoader();
             this.scene = new THREE.Scene();
             this.objects = new THREE.Group();
             this.lights = new THREE.Group();
             this.sideLength = 0;
+            this.distance = 10;
         }
         StlSnapshotService.prototype.read = function () {
             return __awaiter(this, void 0, void 0, function () {
@@ -739,7 +735,8 @@
                             return [4 /*yield*/, this.read()];
                         case 1:
                             _a.apply(this, [_b.sent()]);
-                            return [2 /*return*/, this.shot(fileSave)];
+                            return [4 /*yield*/, this.shot(fileSave)];
+                        case 2: return [2 /*return*/, _b.sent()];
                     }
                 });
             });
@@ -749,55 +746,89 @@
             this.geometry.computeBoundingBox();
             this.geometry.center();
             this.geometry.computeBoundingSphere();
-            var _a = this.geometry.boundingBox, max = _a.max, min = _a.min;
-            this.sideLength = Math.ceil(Math.max(max.x - min.x, max.y - min.y, max.z - min.z));
-            this.canvas.height = this.canvas.width = this.sideLength;
-            this.camera = new THREE.OrthographicCamera(-this.sideLength / 2, this.sideLength / 2, this.sideLength / 2, -this.sideLength / 2, 1, 1000);
-            this.camera.position.set(0, 0, 100);
-            this.camera.lookAt(new THREE.Vector3(0, 0, 0));
+            var _a = this.geometry.boundingBox.max, x = _a.x, y = _a.y, z = _a.z;
+            this.distance = Math.max(x, y, z) * 10;
+            var _b = this.geometry.boundingSphere, center = _b.center, radius = _b.radius;
+            console.debug(center, radius, x, y, z);
+            this.center = center;
+            this.sideLength = radius * 2;
+            this.canvas.height = this.canvas.width = this.sideLength * this.ppmm;
+            this.renderer = new THREE.WebGLRenderer({
+                alpha: true,
+                antialias: true,
+                canvas: this.canvas,
+            });
+            this.camera = new THREE.PerspectiveCamera(15, 1);
+            this.camera.position.set(0, this.distance, 0);
+            this.camera.lookAt(center);
             this.lights.add(LIGHT_0, LIGHT_1, LIGHT_2, LIGHT_3);
             this.camera.add(LIGHT_4);
-            this.objects.add(new THREE.Mesh(this.geometry, MATERIAL_0(0xffffff)));
+            var mesh = new THREE.Mesh(this.geometry, MATERIAL_0(0xffffff));
+            mesh.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), -Math.PI / 2);
+            this.objects.add(mesh);
             this.scene.add(this.camera, this.objects, this.lights);
+            this.renderer.render(this.scene, this.camera);
         };
         StlSnapshotService.prototype.shot = function (fileSave) {
-            var e_1, _a;
-            var images = [];
-            var positions = [
-                [0, 0, 100, -1, 0, 0],
-                [0, 0, -100, 1, 0, 0],
-                [0, 100, 50, 0, 0, -1],
-                [100, 0, 50, 0, 0, -1],
-                [0, 100, -50, 0, 0, 1],
-                [100, 0, -50, 0, 0, 1],
-            ];
-            try {
-                for (var positions_1 = __values(positions), positions_1_1 = positions_1.next(); !positions_1_1.done; positions_1_1 = positions_1.next()) {
-                    var p = positions_1_1.value;
-                    this.camera.position.set(p[0], p[1], p[2]);
-                    this.camera.up.set(p[3], p[4], p[5]);
-                    this.camera.lookAt(new THREE.Vector3(0, 0, 0));
-                    this.camera.updateProjectionMatrix();
-                    this.renderer.render(this.scene, this.camera);
-                    var dataURL = this.canvas.toDataURL('image/png');
-                    images.push(dataURL);
-                    if (fileSave) {
-                        fileSave(dataURL.replace(/^data:image\/\w+;base64,/, ''));
+            return __awaiter(this, void 0, void 0, function () {
+                var images, positions, positions_1, positions_1_1, p, dataURL, e_1_1;
+                var e_1, _a;
+                return __generator(this, function (_b) {
+                    switch (_b.label) {
+                        case 0:
+                            images = [];
+                            positions = [
+                                [0, this.distance, 0],
+                                [0, -this.distance, 0],
+                                [this.distance, 0, 0],
+                                [-this.distance, 0, 0],
+                                [0, 0, this.distance],
+                                [0, 0, -this.distance],
+                            ];
+                            _b.label = 1;
+                        case 1:
+                            _b.trys.push([1, 6, 7, 8]);
+                            positions_1 = __values(positions), positions_1_1 = positions_1.next();
+                            _b.label = 2;
+                        case 2:
+                            if (!!positions_1_1.done) return [3 /*break*/, 5];
+                            p = positions_1_1.value;
+                            this.camera.position.set(p[0], p[1], p[2]);
+                            this.camera.lookAt(this.center);
+                            this.camera.up.set(0, 0, p.some(function (x) { return x > 0; }) ? -1 : 1);
+                            this.camera.updateProjectionMatrix();
+                            this.renderer.render(this.scene, this.camera);
+                            return [4 /*yield*/, new Promise(function (resolve, reject) { return setTimeout(resolve); })];
+                        case 3:
+                            _b.sent();
+                            dataURL = this.canvas.toDataURL('image/png');
+                            images.push(dataURL);
+                            if (fileSave) {
+                                fileSave(dataURL.replace(/^data:image\/\w+;base64,/, ''));
+                            }
+                            _b.label = 4;
+                        case 4:
+                            positions_1_1 = positions_1.next();
+                            return [3 /*break*/, 2];
+                        case 5: return [3 /*break*/, 8];
+                        case 6:
+                            e_1_1 = _b.sent();
+                            e_1 = { error: e_1_1 };
+                            return [3 /*break*/, 8];
+                        case 7:
+                            try {
+                                if (positions_1_1 && !positions_1_1.done && (_a = positions_1.return)) _a.call(positions_1);
+                            }
+                            finally { if (e_1) throw e_1.error; }
+                            return [7 /*endfinally*/];
+                        case 8: return [2 /*return*/, {
+                                images: images,
+                                sideLength: this.sideLength,
+                                ppmm: this.ppmm,
+                            }];
                     }
-                }
-            }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
-            finally {
-                try {
-                    if (positions_1_1 && !positions_1_1.done && (_a = positions_1.return)) _a.call(positions_1);
-                }
-                finally { if (e_1) throw e_1.error; }
-            }
-            return {
-                images: images,
-                sideLength: this.sideLength,
-                ppmm: this.ppmm,
-            };
+                });
+            });
         };
         return StlSnapshotService;
     }());

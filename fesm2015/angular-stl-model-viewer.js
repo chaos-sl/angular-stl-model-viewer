@@ -1,6 +1,6 @@
 import { __awaiter } from 'tslib';
 import { EventEmitter, ɵɵdirectiveInject, ChangeDetectorRef, ElementRef, NgZone, ɵɵdefineComponent, ɵsetClassMetadata, Component, ChangeDetectionStrategy, Input, Output, ɵɵdefineNgModule, ɵɵdefineInjector, ɵɵsetNgModuleScope, NgModule } from '@angular/core';
-import { Vector3, PerspectiveCamera, DirectionalLight, MeshPhongMaterial, Scene, WebGLRenderer, Object3D, LightProbe, Color, CubeTextureLoader, sRGBEncoding, MeshStandardMaterial, Mesh, DoubleSide, AmbientLight, Group, OrthographicCamera } from 'three';
+import { Vector3, PerspectiveCamera, DirectionalLight, MeshPhongMaterial, Scene, WebGLRenderer, Object3D, LightProbe, Color, CubeTextureLoader, sRGBEncoding, MeshStandardMaterial, Mesh, DoubleSide, AmbientLight, Group } from 'three';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { LightProbeGenerator } from 'three/examples/jsm/lights/LightProbeGenerator.js';
@@ -349,16 +349,12 @@ class StlSnapshotService {
         this.file = file;
         this.ppmm = ppmm;
         this.canvas = document.createElement('canvas');
-        this.renderer = new WebGLRenderer({
-            alpha: true,
-            antialias: true,
-            canvas: this.canvas,
-        });
         this.stlLoader = new STLLoader();
         this.scene = new Scene();
         this.objects = new Group();
         this.lights = new Group();
         this.sideLength = 0;
+        this.distance = 10;
     }
     read() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -375,7 +371,7 @@ class StlSnapshotService {
     snapshot(fileSave) {
         return __awaiter(this, void 0, void 0, function* () {
             this.init(yield this.read());
-            return this.shot(fileSave);
+            return yield this.shot(fileSave);
         });
     }
     init(data) {
@@ -383,44 +379,59 @@ class StlSnapshotService {
         this.geometry.computeBoundingBox();
         this.geometry.center();
         this.geometry.computeBoundingSphere();
-        const { max, min } = this.geometry.boundingBox;
-        this.sideLength = Math.ceil(Math.max(max.x - min.x, max.y - min.y, max.z - min.z));
-        this.canvas.height = this.canvas.width = this.sideLength;
-        this.camera = new OrthographicCamera(-this.sideLength / 2, this.sideLength / 2, this.sideLength / 2, -this.sideLength / 2, 1, 1000);
-        this.camera.position.set(0, 0, 100);
-        this.camera.lookAt(new Vector3(0, 0, 0));
+        const { x, y, z } = this.geometry.boundingBox.max;
+        this.distance = Math.max(x, y, z) * 10;
+        const { center, radius } = this.geometry.boundingSphere;
+        console.debug(center, radius, x, y, z);
+        this.center = center;
+        this.sideLength = radius * 2;
+        this.canvas.height = this.canvas.width = this.sideLength * this.ppmm;
+        this.renderer = new WebGLRenderer({
+            alpha: true,
+            antialias: true,
+            canvas: this.canvas,
+        });
+        this.camera = new PerspectiveCamera(15, 1);
+        this.camera.position.set(0, this.distance, 0);
+        this.camera.lookAt(center);
         this.lights.add(LIGHT_0, LIGHT_1, LIGHT_2, LIGHT_3);
         this.camera.add(LIGHT_4);
-        this.objects.add(new Mesh(this.geometry, MATERIAL_0(0xffffff)));
+        const mesh = new Mesh(this.geometry, MATERIAL_0(0xffffff));
+        mesh.rotateOnWorldAxis(new Vector3(0, 1, 0), -Math.PI / 2);
+        this.objects.add(mesh);
         this.scene.add(this.camera, this.objects, this.lights);
+        this.renderer.render(this.scene, this.camera);
     }
     shot(fileSave) {
-        const images = [];
-        const positions = [
-            [0, 0, 100, -1, 0, 0],
-            [0, 0, -100, 1, 0, 0],
-            [0, 100, 50, 0, 0, -1],
-            [100, 0, 50, 0, 0, -1],
-            [0, 100, -50, 0, 0, 1],
-            [100, 0, -50, 0, 0, 1],
-        ];
-        for (const p of positions) {
-            this.camera.position.set(p[0], p[1], p[2]);
-            this.camera.up.set(p[3], p[4], p[5]);
-            this.camera.lookAt(new Vector3(0, 0, 0));
-            this.camera.updateProjectionMatrix();
-            this.renderer.render(this.scene, this.camera);
-            const dataURL = this.canvas.toDataURL('image/png');
-            images.push(dataURL);
-            if (fileSave) {
-                fileSave(dataURL.replace(/^data:image\/\w+;base64,/, ''));
+        return __awaiter(this, void 0, void 0, function* () {
+            const images = [];
+            const positions = [
+                [0, this.distance, 0],
+                [0, -this.distance, 0],
+                [this.distance, 0, 0],
+                [-this.distance, 0, 0],
+                [0, 0, this.distance],
+                [0, 0, -this.distance],
+            ];
+            for (const p of positions) {
+                this.camera.position.set(p[0], p[1], p[2]);
+                this.camera.lookAt(this.center);
+                this.camera.up.set(0, 0, p.some((x) => x > 0) ? -1 : 1);
+                this.camera.updateProjectionMatrix();
+                this.renderer.render(this.scene, this.camera);
+                yield new Promise((resolve, reject) => setTimeout(resolve));
+                const dataURL = this.canvas.toDataURL('image/png');
+                images.push(dataURL);
+                if (fileSave) {
+                    fileSave(dataURL.replace(/^data:image\/\w+;base64,/, ''));
+                }
             }
-        }
-        return {
-            images,
-            sideLength: this.sideLength,
-            ppmm: this.ppmm,
-        };
+            return {
+                images,
+                sideLength: this.sideLength,
+                ppmm: this.ppmm,
+            };
+        });
     }
 }
 
